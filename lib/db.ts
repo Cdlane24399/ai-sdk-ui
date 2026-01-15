@@ -1,23 +1,26 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, NeonQueryFunction } from "@neondatabase/serverless";
 
-// Validate DATABASE_URL is set
-const getDatabaseUrl = () => {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error(
-      "DATABASE_URL environment variable is not set. Please configure your Neon database connection string."
-    );
+// Lazily initialized database connection
+let _sql: NeonQueryFunction<false, false> | null = null;
+
+// Get database connection (lazy initialization to avoid build-time errors)
+export function getSql(): NeonQueryFunction<false, false> {
+  if (!_sql) {
+    const url = process.env.DATABASE_URL;
+    if (!url) {
+      throw new Error(
+        "DATABASE_URL environment variable is not set. Please configure your Neon database connection string."
+      );
+    }
+    _sql = neon(url);
   }
-  return url;
-};
-
-// Database connection using Neon serverless driver
-const sql = neon(getDatabaseUrl());
-
-export { sql };
+  return _sql;
+}
 
 // Initialize database tables
 export async function initializeDatabase() {
+  const sql = getSql();
+
   // Create users table
   await sql`
     CREATE TABLE IF NOT EXISTS users (

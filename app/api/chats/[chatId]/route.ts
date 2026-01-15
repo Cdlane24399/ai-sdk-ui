@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
 type RouteParams = {
@@ -27,6 +27,8 @@ export async function GET(req: Request, { params }: RouteParams) {
         { status: 400 }
       );
     }
+
+    const sql = getSql();
 
     // Get chat and verify ownership
     const chats = await sql`
@@ -87,6 +89,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 
     const { title } = await req.json();
 
+    const sql = getSql();
+
     const result = await sql`
       UPDATE chats
       SET title = ${title}, updated_at = CURRENT_TIMESTAMP
@@ -132,6 +136,8 @@ export async function DELETE(req: Request, { params }: RouteParams) {
         { status: 400 }
       );
     }
+
+    const sql = getSql();
 
     const result = await sql`
       DELETE FROM chats

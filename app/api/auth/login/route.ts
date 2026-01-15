@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { verifyPassword, createToken, setAuthCookie } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -12,6 +12,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const sql = getSql();
 
     // Find user by email
     const users = await sql`

@@ -1,18 +1,22 @@
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
-// Validate JWT_SECRET is set in production
-const getJwtSecret = () => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV === "production") {
-    throw new Error("JWT_SECRET environment variable must be set in production");
-  }
-  return new TextEncoder().encode(
-    secret || "dev-only-secret-change-in-production"
-  );
-};
+// Lazily initialized JWT secret
+let _jwtSecret: Uint8Array | null = null;
 
-const JWT_SECRET = getJwtSecret();
+// Get JWT secret (lazy initialization to avoid build-time errors)
+function getJwtSecret(): Uint8Array {
+  if (!_jwtSecret) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret && process.env.NODE_ENV === "production") {
+      throw new Error("JWT_SECRET environment variable must be set in production");
+    }
+    _jwtSecret = new TextEncoder().encode(
+      secret || "dev-only-secret-change-in-production"
+    );
+  }
+  return _jwtSecret;
+}
 
 const COOKIE_NAME = "auth_token";
 
@@ -28,7 +32,7 @@ export async function createToken(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   return token;
 }
@@ -36,7 +40,7 @@ export async function createToken(payload: JWTPayload): Promise<string> {
 // Verify and decode a JWT token
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;

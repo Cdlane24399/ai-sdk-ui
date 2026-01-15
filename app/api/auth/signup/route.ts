@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
 
 // Email validation regex
@@ -32,6 +32,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const sql = getSql();
 
     // Check if user already exists
     const existingUsers = await sql`

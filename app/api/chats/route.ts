@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
 // Get all chats for the current user
@@ -13,6 +13,8 @@ export async function GET() {
         { status: 401 }
       );
     }
+
+    const sql = getSql();
 
     const chats = await sql`
       SELECT id, title, model_id, created_at, updated_at
@@ -44,6 +46,8 @@ export async function POST(req: Request) {
     }
 
     const { title, modelId } = await req.json();
+
+    const sql = getSql();
 
     const result = await sql`
       INSERT INTO chats (user_id, title, model_id)

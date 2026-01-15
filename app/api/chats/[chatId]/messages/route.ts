@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
 type RouteParams = {
@@ -27,6 +27,8 @@ export async function POST(req: Request, { params }: RouteParams) {
         { status: 400 }
       );
     }
+
+    const sql = getSql();
 
     // Verify chat ownership
     const chats = await sql`
