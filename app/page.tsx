@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Layers, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModelSelector, useModelSelection } from "@/components/model-selector";
+import { UserMenu } from "@/components/auth-dialog";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -49,9 +50,7 @@ export default function Home() {
           <Button variant="ghost" size="sm">
             Docs
           </Button>
-          <Button variant="outline" size="sm">
-            Sign in
-          </Button>
+          <UserMenu />
         </nav>
       </motion.header>
 
