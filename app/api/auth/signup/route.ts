@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
 
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+
 export async function POST(req: Request) {
   try {
     const { email, password, name } = await req.json();
@@ -9,6 +13,22 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    if (!EMAIL_REGEX.test(email)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address" },
+        { status: 400 }
+      );
+    }
+
+    // Validate password strength
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return NextResponse.json(
+        { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long` },
         { status: 400 }
       );
     }

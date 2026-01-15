@@ -134,7 +134,7 @@ export function AuthDialog({
               className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border/50 focus:outline-none focus:ring-2 focus:ring-copper/30 transition-all"
               placeholder="••••••••"
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
 

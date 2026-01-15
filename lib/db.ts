@@ -1,7 +1,18 @@
 import { neon } from "@neondatabase/serverless";
 
+// Validate DATABASE_URL is set
+const getDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL environment variable is not set. Please configure your Neon database connection string."
+    );
+  }
+  return url;
+};
+
 // Database connection using Neon serverless driver
-const sql = neon(process.env.DATABASE_URL!);
+const sql = neon(getDatabaseUrl());
 
 export { sql };
 
